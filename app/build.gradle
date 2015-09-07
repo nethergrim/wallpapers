@@ -1,4 +1,9 @@
+plugins {
+    id "me.tatarka.retrolambda" version "3.2.2"
+}
+
 apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion 23
@@ -11,15 +16,54 @@ android {
         versionCode 1
         versionName "1.0"
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+    }
+    dexOptions {
+        incremental false
+    }
 }
+
+apt {
+    arguments {
+        resourcePackageName android.defaultConfig.applicationId
+        androidManifestFile variant.outputs[0].processResources.manifestFile
+    }
+}
+
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.android.support:support-v4:23.0.1'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+
+    provided 'org.glassfish:javax.annotation:10.0-b28'
+
+    compile 'com.google.dagger:dagger:2.1-SNAPSHOT'
+    apt 'com.google.dagger:dagger-compiler:2.1-SNAPSHOT'
+
+
+    compile 'io.reactivex:rxandroid:1.0.1'
+    compile 'io.reactivex:rxjava:1.0.14'
+    compile 'com.jakewharton.rxbinding:rxbinding:0.2.0'
+    compile 'com.jakewharton.rxbinding:rxbinding-support-v4:0.2.0'
+    compile 'com.jakewharton.rxbinding:rxbinding-appcompat-v7:0.2.0'
+    compile 'com.jakewharton.rxbinding:rxbinding-design:0.2.0'
+    compile 'com.jakewharton.rxbinding:rxbinding-recyclerview-v7:0.2.0'
+    compile 'com.trello:rxlifecycle:0.3.0'
+    compile 'com.trello:rxlifecycle-components:0.3.0'
+    compile 'com.jakewharton:butterknife:6.1.0'
 }
