@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import java.io.IOException;
+
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -28,6 +30,7 @@ public class ImageLoaderImpl implements ImageLoader {
 
     @Override
     public void displayImage(String url, ImageView imageView) {
+        Picasso.with(mContext).cancelRequest(imageView);
         Picasso.with(mContext).load(url).into(imageView);
     }
 
@@ -50,26 +53,14 @@ public class ImageLoaderImpl implements ImageLoader {
                             subscriber.onCompleted();
                             return;
                         }
-                        Target target = new Target() {
-                            @Override
-                            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                                subscriber.onNext(Boolean.TRUE);
-                                subscriber.onCompleted();
-                            }
-
-                            @Override
-                            public void onBitmapFailed(Drawable errorDrawable) {
-                                subscriber.onNext(Boolean.FALSE);
-                                subscriber.onCompleted();
-                            }
-
-                            @Override
-                            public void onPrepareLoad(Drawable placeHolderDrawable) {
-                            }
-                        };
-                        Picasso.with(mContext).load(url)
-                                .config(Bitmap.Config.RGB_565)
-                                .into(target);
+                        try {
+                            Picasso.with(mContext).load(url).get();
+                            subscriber.onNext(Boolean.TRUE);
+                            subscriber.onCompleted();
+                        } catch (IOException e) {
+                            subscriber.onNext(Boolean.FALSE);
+                            subscriber.onCompleted();
+                        }
                     }
                 });
     }
@@ -82,9 +73,6 @@ public class ImageLoaderImpl implements ImageLoader {
                         if (subscriber.isUnsubscribed()) {
                             subscriber.onCompleted();
                             return;
-                        }
-                        if (Looper.myLooper() == Looper.getMainLooper()) {
-                            Log.i("ISSUE5", " call - main thread ");
                         }
                         Target target = new Target() {
                             @Override

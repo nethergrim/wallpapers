@@ -66,4 +66,5 @@ dependencies {
     compile 'com.trello:rxlifecycle:0.3.0'
     compile 'com.trello:rxlifecycle-components:0.3.0'
     compile 'com.jakewharton:butterknife:6.1.0'
+    compile 'io.realm:realm-android:0.82.2'
 }

@@ -9,5 +9,6 @@ public interface Prefs {
 
     void addUrl(String url);
     List<String> getAllUrls();
+    void persistList(List<String> data);
 
 }

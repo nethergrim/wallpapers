@@ -5,7 +5,6 @@ import android.app.Application;
 import com.nethergrim.wallpapers.inject.DaggerMainComponent;
 import com.nethergrim.wallpapers.inject.MainComponent;
 import com.nethergrim.wallpapers.inject.ProviderModule;
-import com.nethergrim.wallpapers.util.UrlHelper;
 
 /**
  * @author Andrew Drobyazko (andrey.drobyazko@applikeysolutions.com) on 07.09.15.
@@ -22,8 +21,6 @@ public class App extends Application {
         this.mMainComponent = DaggerMainComponent.builder()
                 .providerModule(new ProviderModule())
                 .build();
-        UrlHelper urlHelper = new UrlHelper();
-        urlHelper.getAndPersistAllAccessibleUrls();
     }
 
     public MainComponent getMainComponent() {

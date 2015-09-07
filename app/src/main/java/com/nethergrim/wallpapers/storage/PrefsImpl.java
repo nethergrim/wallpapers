@@ -2,6 +2,7 @@ package com.nethergrim.wallpapers.storage;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.nethergrim.wallpapers.App;
 
@@ -26,12 +27,18 @@ public class PrefsImpl implements Prefs {
     public void addUrl(String url) {
         List<String> urls = getAllUrls();
         urls.add(url);
-        mPreferences.edit().putStringSet(KEY_URLS, new HashSet<>(urls)).apply();
+        mPreferences.edit().putStringSet(KEY_URLS, new HashSet<>(urls)).commit();
     }
 
     @Override
     public List<String> getAllUrls() {
         Set<String> urls = mPreferences.getStringSet(KEY_URLS, new HashSet<>(0));
         return new ArrayList<>(urls);
+    }
+
+    @Override
+    public void persistList(List<String> data) {
+        mPreferences.edit().putStringSet(KEY_URLS,new HashSet<>(data)).apply();
+        Log.e("TAG", "persisted");
     }
 }

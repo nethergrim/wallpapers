@@ -1,5 +1,6 @@
 package com.nethergrim.wallpapers.inject;
 
+import com.nethergrim.wallpapers.fragment.BaseFragment;
 import com.nethergrim.wallpapers.util.UrlHelper;
 
 import javax.inject.Singleton;
@@ -18,4 +19,6 @@ import dagger.Component;
 public interface MainComponent {
 
     void inject(UrlHelper urlHelper);
+
+    void inject(BaseFragment baseFragment);
 }
