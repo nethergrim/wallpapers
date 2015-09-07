@@ -1,11 +1,12 @@
 package com.nethergrim.wallpapers.activity;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 
 import com.nethergrim.wallpapers.R;
 import com.nethergrim.wallpapers.fragment.ImageFragment;
@@ -27,26 +28,35 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
-        Log.e("TAG", "fetching");
-        JSONArray jsonArray = FileUtils.getJSONArrayFromAssets(FileUtils.JSON_FILE_NAME);
-        Log.e("TAG", "fetched");
-        PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager(), jsonArray);
-        mPager.setAdapter(pagerAdapter);
+        new Thread(() -> {
+            JSONArray jsonArray = FileUtils.getJSONArrayFromAssets(FileUtils.JSON_FILE_NAME);
+            new Handler(Looper.getMainLooper()).post(() -> {
+                PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager(),
+                        jsonArray);
+                mPager.setAdapter(pagerAdapter);
+            });
+        }).start();
     }
 
     private static class PagerAdapter extends FragmentStatePagerAdapter {
 
-        JSONArray mJSONArray;
+        private JSONArray mJSONArray;
+        private int mLastId;
 
         public PagerAdapter(FragmentManager fm, JSONArray jsonArray) {
             super(fm);
             this.mJSONArray = jsonArray;
         }
 
+        public int getLastId() {
+            return mLastId;
+        }
+
         @Override
         public Fragment getItem(int position) {
             try {
-                return ImageFragment.getInstance(mJSONArray.getInt(position));
+                mLastId = mJSONArray.getInt(position);
+                return ImageFragment.getInstance(mLastId);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
