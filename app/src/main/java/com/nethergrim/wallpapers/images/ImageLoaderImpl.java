@@ -2,13 +2,9 @@ package com.nethergrim.wallpapers.images;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.os.Looper;
-import android.util.Log;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import java.io.IOException;
 
@@ -66,7 +62,7 @@ public class ImageLoaderImpl implements ImageLoader {
     }
 
     private Observable<Bitmap> getBitmapObservable(String url) {
-        Observable<Bitmap> bitmapObservable = Observable.create(
+        return Observable.create(
                 new Observable.OnSubscribe<Bitmap>() {
                     @Override
                     public void call(final Subscriber<? super Bitmap> subscriber) {
@@ -74,34 +70,18 @@ public class ImageLoaderImpl implements ImageLoader {
                             subscriber.onCompleted();
                             return;
                         }
-                        Target target = new Target() {
-                            @Override
-                            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                                Log.i("picasso", " onBitmapLoaded ");
-                                if (Looper.myLooper() == Looper.getMainLooper()) {
-                                    Log.i("ISSUE5", " Target - onBitmapLoaded - main thread ");
-                                }
-                                subscriber.onNext(bitmap);
-                                subscriber.onCompleted();
-                            }
+                        try {
+                            Bitmap bitmap = Picasso.with(mContext).load(url).get();
+                            subscriber.onNext(bitmap);
+                            subscriber.onCompleted();
+                        } catch (IOException e) {
+                            subscriber.onError(e);
+                        }
 
-                            @Override
-                            public void onBitmapFailed(Drawable errorDrawable) {
-                                subscriber.onError(new Exception(" Failed to load bitmap"));
-                            }
-
-                            @Override
-                            public void onPrepareLoad(Drawable placeHolderDrawable) {
-                            }
-                        };
-                        Picasso.with(mContext).load(url)
-                                .config(Bitmap.Config.RGB_565)
-                                .into(target);
                     }
-                });
-        bitmapObservable.subscribeOn(AndroidSchedulers.mainThread());
-        bitmapObservable.observeOn(Schedulers.io());
-        return bitmapObservable;
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
 
     }
 }

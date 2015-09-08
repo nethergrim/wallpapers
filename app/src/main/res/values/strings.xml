@@ -2,4 +2,7 @@
     <string name="app_name">Earth Wallpapers</string>
 
     <string name="wallpaper">Wallpaper</string>
+    <string name="thank_you">Thank You!</string>
+    <string name="send_to">Send to:</string>
+    <string name="done">Done</string>
 </resources>

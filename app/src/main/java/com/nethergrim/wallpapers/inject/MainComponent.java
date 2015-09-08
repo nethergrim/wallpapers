@@ -1,5 +1,6 @@
 package com.nethergrim.wallpapers.inject;
 
+import com.nethergrim.wallpapers.activity.MainActivity;
 import com.nethergrim.wallpapers.fragment.BaseFragment;
 import com.nethergrim.wallpapers.util.UrlHelper;
 
@@ -21,4 +22,6 @@ public interface MainComponent {
     void inject(UrlHelper urlHelper);
 
     void inject(BaseFragment baseFragment);
+
+    void inject(MainActivity mainActivity);
 }
