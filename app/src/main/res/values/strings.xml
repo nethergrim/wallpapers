@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Earth Wallpapers</string>
 
+    <string name="wallpaper">Wallpaper</string>
 </resources>

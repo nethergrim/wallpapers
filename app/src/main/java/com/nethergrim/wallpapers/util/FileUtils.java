@@ -50,7 +50,7 @@ public class FileUtils {
     }
 
 
-    public static JSONArray getJSONArrayFromAssets(String assetsName) {
+    public static JSONArray getJSONFromAssets(String assetsName) {
         InputStream is = FileUtils.getAssetFileInputStream(assetsName);
 
         StringBuilder stringBuilder = new StringBuilder();

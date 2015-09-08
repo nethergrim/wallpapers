@@ -53,7 +53,7 @@ public class ImageFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mImageLoader.displayImage(PREVIEW_URL + mId + ".jpg", mImage);
+        mImageLoader.displayImage(FULL_URL + mId + ".jpg", mImage);
     }
 
     @Override
