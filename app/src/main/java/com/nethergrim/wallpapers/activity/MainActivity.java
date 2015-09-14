@@ -2,20 +2,22 @@ package com.nethergrim.wallpapers.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.AlarmManager;
 import android.app.DownloadManager;
+import android.app.PendingIntent;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -26,8 +28,12 @@ import com.nethergrim.wallpapers.App;
 import com.nethergrim.wallpapers.R;
 import com.nethergrim.wallpapers.fragment.ImageFragment;
 import com.nethergrim.wallpapers.images.ImageLoader;
+import com.nethergrim.wallpapers.storage.Prefs;
+import com.nethergrim.wallpapers.util.AlarmReceiver;
 import com.nethergrim.wallpapers.util.FileUtils;
+import com.nethergrim.wallpapers.util.LayoutAnimator;
 import com.nethergrim.wallpapers.util.PictureHelper;
+import com.rey.material.widget.Switch;
 
 import org.json.JSONArray;
 
@@ -44,7 +50,7 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements Switch.OnCheckedChangeListener {
 
     @InjectView(R.id.pager)
     ViewPager mPager;
@@ -60,17 +66,44 @@ public class MainActivity extends BaseActivity {
     ImageButton mBtnThumpsDown;
     @InjectView(R.id.btn_thumps_up)
     ImageButton mBtnThumpsUp;
+
     @Inject
     ImageLoader mImageLoader;
+    @Inject
+    Prefs mPrefs;
     @InjectView(R.id.progressBar2)
     ProgressBar mProgressBar2;
     @InjectView(R.id.shadow)
     View mShadow;
-    @InjectView(R.id.toolbar)
-    Toolbar mToolbar;
     @InjectView(R.id.btn_layout)
     LinearLayout mBtnLayout;
+    @InjectView(R.id.switch_auto_change)
+    Switch mSwitchAutoChange;
+    @InjectView(R.id.settings_layout)
+    LinearLayout mSettingsLayout;
     private PagerAdapter mPagerAdapter;
+    private LayoutAnimator mLayoutAnimator;
+    private GestureDetector mTapGestureDetector;
+
+    @Override
+    public void onCheckedChanged(Switch aSwitch, boolean b) {
+        mPrefs.setAutoRefresh(b);
+        if (b) {
+            Toast.makeText(this, R.string.wallpapers_will_be_switched, Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, AlarmReceiver.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            alarmManager.setInexactRepeating(AlarmManager.RTC,
+                    System.currentTimeMillis() + AlarmManager.INTERVAL_HALF_HOUR,
+                    AlarmManager.INTERVAL_HALF_HOUR, pendingIntent);
+        } else {
+            Intent intent = new Intent(this, AlarmReceiver.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            alarmManager.cancel(pendingIntent);
+
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,16 +111,53 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         App.getApp().getMainComponent().inject(this);
         ButterKnife.inject(this);
-
-        if (Build.VERSION.SDK_INT >= 21) {
-            mToolbar.setTranslationZ(8);
-            mBtnLayout.setTranslationZ(8);
-        }
-
+        mLayoutAnimator = new LayoutAnimator(mBtnLayout, mSettingsLayout,
+                getResources().getDimensionPixelSize(R.dimen.action_bar_height));
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-        mPager.setOffscreenPageLimit(8);
+        mPager.setOffscreenPageLimit(4);
+        mTapGestureDetector = new GestureDetector(this, new GestureDetector.OnGestureListener() {
+            @Override
+            public boolean onDown(MotionEvent e) {
+                return false;
+            }
+
+            @Override
+            public void onShowPress(MotionEvent e) {
+
+            }
+
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                mLayoutAnimator.toggle();
+                return false;
+            }
+
+            @Override
+            public boolean onScroll(MotionEvent e1,
+                    MotionEvent e2,
+                    float distanceX,
+                    float distanceY) {
+                return false;
+            }
+
+            @Override
+            public void onLongPress(MotionEvent e) {
+
+            }
+
+            @Override
+            public boolean onFling(MotionEvent e1,
+                    MotionEvent e2,
+                    float velocityX,
+                    float velocityY) {
+                return false;
+            }
+        });
+        mPager.setOnTouchListener((v, event) -> mTapGestureDetector.onTouchEvent(event));
+        mSwitchAutoChange.setChecked(mPrefs.isAutoRefreshEnabled());
+        mSwitchAutoChange.setOnCheckedChangeListener(this);
         Observable.just(Boolean.TRUE)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())

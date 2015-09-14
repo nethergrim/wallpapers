@@ -17,6 +17,7 @@ import java.util.Set;
 public class PrefsImpl implements Prefs {
 
     public static final String KEY_URLS = "urls";
+    public static final String KEY_REFRESH = "rfrsh";
     private SharedPreferences mPreferences;
 
     public PrefsImpl() {
@@ -38,7 +39,17 @@ public class PrefsImpl implements Prefs {
 
     @Override
     public void persistList(List<String> data) {
-        mPreferences.edit().putStringSet(KEY_URLS,new HashSet<>(data)).apply();
+        mPreferences.edit().putStringSet(KEY_URLS, new HashSet<>(data)).apply();
         Log.e("TAG", "persisted");
+    }
+
+    @Override
+    public void setAutoRefresh(boolean autoRefresh) {
+        mPreferences.edit().putBoolean(KEY_REFRESH, autoRefresh).apply();
+    }
+
+    @Override
+    public boolean isAutoRefreshEnabled() {
+        return mPreferences.getBoolean(KEY_REFRESH, false);
     }
 }

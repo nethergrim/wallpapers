@@ -2,6 +2,7 @@ package com.nethergrim.wallpapers.inject;
 
 import com.nethergrim.wallpapers.activity.MainActivity;
 import com.nethergrim.wallpapers.fragment.BaseFragment;
+import com.nethergrim.wallpapers.util.AlarmReceiver;
 
 import javax.inject.Singleton;
 
@@ -21,4 +22,6 @@ public interface MainComponent {
     void inject(BaseFragment baseFragment);
 
     void inject(MainActivity mainActivity);
+
+    void inject(AlarmReceiver alarmReceiver);
 }
