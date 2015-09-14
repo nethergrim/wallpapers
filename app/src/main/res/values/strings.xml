@@ -5,4 +5,7 @@
     <string name="thank_you">Thank You!</string>
     <string name="send_to">Send to:</string>
     <string name="done">Done</string>
+    <string name="auto_change">Auto switching</string>
+    <string name="every">every</string>
+    <string name="wallpapers_will_be_switched">Wallpapers will be switched automatically every 30 minutes.</string>
 </resources>
