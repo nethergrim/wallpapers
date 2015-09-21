@@ -25,6 +25,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.nethergrim.wallpapers.App;
+import com.nethergrim.wallpapers.BuildConfig;
 import com.nethergrim.wallpapers.R;
 import com.nethergrim.wallpapers.fragment.ImageFragment;
 import com.nethergrim.wallpapers.images.ImageLoader;
@@ -170,6 +171,9 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
                     mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), ph);
                     mPager.setAdapter(mPagerAdapter);
                 });
+        if (BuildConfig.PAID.equalsIgnoreCase("true")){
+            Toast.makeText(this, "Thank you for purchase! =)))", Toast.LENGTH_LONG).show();
+        }
 
     }
 
