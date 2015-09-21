@@ -34,6 +34,17 @@ android {
     dexOptions {
         incremental false
     }
+    productFlavors {
+        free {
+            applicationId "com.nethergrim.wallpapers"
+        }
+        paid {
+            applicationId "com.nethergrim.wallpapers.prime"
+        }
+    }
+    lintOptions {
+        disable 'InvalidPackage'
+    }
 }
 
 apt {
