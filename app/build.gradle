@@ -13,8 +13,8 @@ android {
         applicationId "com.nethergrim.wallpapers"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 3
-        versionName "1.0.3"
+        versionCode 4
+        versionName "1.0.4"
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -37,9 +37,11 @@ android {
     productFlavors {
         free {
             applicationId "com.nethergrim.wallpapers"
+            buildConfigField 'String', 'PAID', '"false"'
         }
         paid {
             applicationId "com.nethergrim.wallpapers.prime"
+            buildConfigField 'String', 'PAID', '"true"'
         }
     }
     lintOptions {
