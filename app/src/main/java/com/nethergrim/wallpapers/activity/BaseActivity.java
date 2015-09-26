@@ -1,6 +1,8 @@
 package com.nethergrim.wallpapers.activity;
 
+import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import com.yandex.metrica.YandexMetrica;
 
@@ -19,6 +21,20 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         YandexMetrica.onResumeActivity(this);
+    }
+
+    private Toast mToast;
+
+    protected void showToast(String s){
+        if (mToast != null){
+            mToast.cancel();
+        }
+        mToast = Toast.makeText(this,s,Toast.LENGTH_SHORT);
+        mToast.show();
+    }
+
+    protected void showToast(@StringRes int s){
+        showToast(getString(s));
     }
 
 }

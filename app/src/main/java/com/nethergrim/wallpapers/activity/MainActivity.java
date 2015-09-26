@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -22,7 +23,6 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.firebase.client.Firebase;
 import com.nethergrim.wallpapers.App;
@@ -43,6 +43,7 @@ import org.json.JSONArray;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 
 import javax.inject.Inject;
@@ -96,7 +97,7 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
     public void onCheckedChanged(Switch aSwitch, boolean b) {
         mPrefs.setAutoRefresh(b);
         if (b) {
-            Toast.makeText(this, R.string.wallpapers_will_be_switched, Toast.LENGTH_SHORT).show();
+            showToast(R.string.wallpapers_will_be_switched);
             Intent intent = new Intent(this, AlarmReceiver.class);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
             AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
@@ -123,7 +124,7 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-        mPager.setOffscreenPageLimit(4);
+        mPager.setOffscreenPageLimit(6);
         mTapGestureDetector = new GestureDetector(this, new GestureDetector.OnGestureListener() {
             @Override
             public boolean onDown(MotionEvent e) {
@@ -178,7 +179,7 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
                     mPager.setAdapter(mPagerAdapter);
                 });
         if (BuildConfig.PAID.equalsIgnoreCase("true")) {
-            Toast.makeText(this, "Thank you for purchase! =)))", Toast.LENGTH_LONG).show();
+            showToast("Thank you for purchase!\n=)");
         }
     }
 
@@ -193,6 +194,8 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
         request.setNotificationVisibility(
                 DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         downloadManager.enqueue(request);
+        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        showToast(getString(R.string.wallpaper_will_be_saved_to) + "\n" + path.toString());
     }
 
     @OnClick(R.id.btn_share)
@@ -216,6 +219,8 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
 
     @OnClick(R.id.btn_set_wallpaper)
     void onWallpaperClick() {
+        mPrefs.setAutoRefresh(false);
+        mSwitchAutoChange.setChecked(false);
         showOverlay();
         mImageLoader.getBitMap(getCurrentUrl())
                 .map(bitmap -> {
@@ -236,7 +241,7 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
                 })
                 .subscribe(bitmap -> {
                     hideOverlay();
-
+                    showToast(R.string.wallpaper_set);
                 }, throwable -> {
                     Log.e("TAG", throwable.toString());
                     hideOverlay();
@@ -246,20 +251,29 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
 
     @OnClick(R.id.btn_thumps_up)
     void onThumbsUpClick() {
-        Toast.makeText(this, R.string.thank_you, Toast.LENGTH_SHORT).show();
+        showToast("+1");
         int id = getCurrentId();
         mFirebase.child("ratings")
                 .child(String.valueOf(id))
                 .runTransaction(new ThumbsUpTransaction());
+        scrollPagerNext();
     }
 
     @OnClick(R.id.btn_thumps_down)
     void onThumbsDownClick() {
-        Toast.makeText(this, R.string.thank_you, Toast.LENGTH_SHORT).show();
+        showToast("-1");
         int id = getCurrentId();
         mFirebase.child("ratings")
                 .child(String.valueOf(id))
                 .runTransaction(new ThumbsDownTransaction());
+        scrollPagerNext();
+    }
+
+    private void scrollPagerNext() {
+        int currentItem = mPager.getCurrentItem();
+        if (mPagerAdapter.getCount() > currentItem + 2) {
+            mPager.setCurrentItem(currentItem + 1, true);
+        }
     }
 
     private void showOverlay() {
