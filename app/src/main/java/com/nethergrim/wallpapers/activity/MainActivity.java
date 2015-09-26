@@ -24,6 +24,11 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.MutableData;
+import com.firebase.client.Transaction;
 import com.nethergrim.wallpapers.App;
 import com.nethergrim.wallpapers.BuildConfig;
 import com.nethergrim.wallpapers.R;
@@ -70,6 +75,9 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
 
     @Inject
     ImageLoader mImageLoader;
+
+    @Inject
+    Firebase mFirebase;
     @Inject
     Prefs mPrefs;
     @InjectView(R.id.progressBar2)
@@ -171,10 +179,9 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
                     mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), ph);
                     mPager.setAdapter(mPagerAdapter);
                 });
-        if (BuildConfig.PAID.equalsIgnoreCase("true")){
+        if (BuildConfig.PAID.equalsIgnoreCase("true")) {
             Toast.makeText(this, "Thank you for purchase! =)))", Toast.LENGTH_LONG).show();
         }
-
     }
 
     @OnClick(R.id.btn_download)
@@ -242,11 +249,65 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
     @OnClick(R.id.btn_thumps_up)
     void onThumbsUpClick() {
         Toast.makeText(this, R.string.thank_you, Toast.LENGTH_SHORT).show();
+        int id = getCurrentId();
+        mFirebase.child("ratings").child(String.valueOf(id)).runTransaction(
+                new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+                        try {
+                            if (mutableData.getValue() == null) {
+                                mutableData.setValue(1);
+                            } else {
+                                Integer rating = mutableData.getValue(Integer.class);
+                                mutableData.setValue(rating + 1);
+                            }
+
+                            return Transaction.success(mutableData);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        return Transaction.abort();
+                    }
+
+                    @Override
+                    public void onComplete(FirebaseError firebaseError,
+                            boolean b,
+                            DataSnapshot dataSnapshot) {
+
+                    }
+                });
     }
 
     @OnClick(R.id.btn_thumps_down)
     void onThumbsDownClick() {
         Toast.makeText(this, R.string.thank_you, Toast.LENGTH_SHORT).show();
+        int id = getCurrentId();
+        mFirebase.child("ratings").child(String.valueOf(id)).runTransaction(
+                new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+                        try {
+                            if (mutableData.getValue() == null) {
+                                mutableData.setValue(-1);
+                            } else {
+                                Integer rating = mutableData.getValue(Integer.class);
+                                mutableData.setValue(rating - 1);
+                            }
+
+                            return Transaction.success(mutableData);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        return Transaction.abort();
+                    }
+
+                    @Override
+                    public void onComplete(FirebaseError firebaseError,
+                            boolean b,
+                            DataSnapshot dataSnapshot) {
+
+                    }
+                });
     }
 
     private void showOverlay() {
@@ -276,6 +337,10 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
 
     private String getCurrentUrl() {
         return mPagerAdapter.getCurrentUrl(mPager.getCurrentItem());
+    }
+
+    private int getCurrentId() {
+        return mPagerAdapter.getCurrentId(mPager.getCurrentItem());
     }
 
     private static class PagerAdapter extends FragmentStatePagerAdapter {

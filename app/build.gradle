@@ -83,4 +83,5 @@ dependencies {
 
     compile 'com.github.rey5137:material:1.2.1'
     compile 'com.github.johnkil.android-robototextview:robototextview:2.4.2'
+    compile 'com.firebase:firebase-client-android:2.4.0+'
 }
