@@ -24,23 +24,20 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.MutableData;
-import com.firebase.client.Transaction;
 import com.nethergrim.wallpapers.App;
 import com.nethergrim.wallpapers.BuildConfig;
 import com.nethergrim.wallpapers.R;
 import com.nethergrim.wallpapers.fragment.ImageFragment;
 import com.nethergrim.wallpapers.images.ImageLoader;
 import com.nethergrim.wallpapers.storage.Prefs;
+import com.nethergrim.wallpapers.storage.ThumbsDownTransaction;
+import com.nethergrim.wallpapers.storage.ThumbsUpTransaction;
 import com.nethergrim.wallpapers.util.AlarmReceiver;
 import com.nethergrim.wallpapers.util.FileUtils;
 import com.nethergrim.wallpapers.util.LayoutAnimator;
 import com.nethergrim.wallpapers.util.PictureHelper;
 import com.rey.material.widget.Switch;
-import com.yandex.metrica.YandexMetrica;
 
 import org.json.JSONArray;
 
@@ -251,67 +248,18 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
     void onThumbsUpClick() {
         Toast.makeText(this, R.string.thank_you, Toast.LENGTH_SHORT).show();
         int id = getCurrentId();
-        mFirebase.child("ratings").child(String.valueOf(id)).runTransaction(
-                new Transaction.Handler() {
-                    @Override
-                    public Transaction.Result doTransaction(MutableData mutableData) {
-                        try {
-                            if (mutableData.getValue() == null) {
-                                mutableData.setValue(1);
-                            } else {
-                                Integer rating = mutableData.getValue(Integer.class);
-                                mutableData.setValue(rating + 1);
-                            }
-
-                            return Transaction.success(mutableData);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        return Transaction.abort();
-                    }
-
-                    @Override
-                    public void onComplete(FirebaseError firebaseError,
-                            boolean b,
-                            DataSnapshot dataSnapshot) {
-                        if (firebaseError != null) {
-                            YandexMetrica.reportEvent(firebaseError.getMessage() + " " + firebaseError.getDetails());
-                        }
-
-                    }
-                });
+        mFirebase.child("ratings")
+                .child(String.valueOf(id))
+                .runTransaction(new ThumbsUpTransaction());
     }
 
     @OnClick(R.id.btn_thumps_down)
     void onThumbsDownClick() {
         Toast.makeText(this, R.string.thank_you, Toast.LENGTH_SHORT).show();
         int id = getCurrentId();
-        mFirebase.child("ratings").child(String.valueOf(id)).runTransaction(
-                new Transaction.Handler() {
-                    @Override
-                    public Transaction.Result doTransaction(MutableData mutableData) {
-                        try {
-                            if (mutableData.getValue() == null) {
-                                mutableData.setValue(-1);
-                            } else {
-                                Integer rating = mutableData.getValue(Integer.class);
-                                mutableData.setValue(rating - 1);
-                            }
-
-                            return Transaction.success(mutableData);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        return Transaction.abort();
-                    }
-
-                    @Override
-                    public void onComplete(FirebaseError firebaseError,
-                            boolean b,
-                            DataSnapshot dataSnapshot) {
-
-                    }
-                });
+        mFirebase.child("ratings")
+                .child(String.valueOf(id))
+                .runTransaction(new ThumbsDownTransaction());
     }
 
     private void showOverlay() {
