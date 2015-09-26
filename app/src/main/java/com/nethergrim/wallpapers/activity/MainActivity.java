@@ -40,6 +40,7 @@ import com.nethergrim.wallpapers.util.FileUtils;
 import com.nethergrim.wallpapers.util.LayoutAnimator;
 import com.nethergrim.wallpapers.util.PictureHelper;
 import com.rey.material.widget.Switch;
+import com.yandex.metrica.YandexMetrica;
 
 import org.json.JSONArray;
 
@@ -273,6 +274,9 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
                     public void onComplete(FirebaseError firebaseError,
                             boolean b,
                             DataSnapshot dataSnapshot) {
+                        if (firebaseError != null) {
+                            YandexMetrica.reportEvent(firebaseError.getMessage() + " " + firebaseError.getDetails());
+                        }
 
                     }
                 });
