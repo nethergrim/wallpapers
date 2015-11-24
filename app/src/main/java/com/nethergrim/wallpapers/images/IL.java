@@ -8,7 +8,7 @@ import rx.Observable;
 /**
  * @author Andrew Drobyazko (c2q9450@gmail.com) on 07.09.15.
  */
-public interface ImageLoader {
+public interface IL {
 
     void displayImage(String url, ImageView imageView);
 

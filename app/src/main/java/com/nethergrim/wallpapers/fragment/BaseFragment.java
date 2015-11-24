@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import com.nethergrim.wallpapers.App;
-import com.nethergrim.wallpapers.images.ImageLoader;
+import com.nethergrim.wallpapers.images.IL;
 
 import javax.inject.Inject;
 
@@ -14,7 +14,7 @@ import javax.inject.Inject;
 public abstract class BaseFragment extends Fragment {
 
     @Inject
-    protected ImageLoader mImageLoader;
+    protected IL mIL;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

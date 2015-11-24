@@ -8,7 +8,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.nethergrim.wallpapers.App;
-import com.nethergrim.wallpapers.images.ImageLoader;
+import com.nethergrim.wallpapers.images.IL;
 
 import org.json.JSONArray;
 
@@ -31,7 +31,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     public static final String TAG = AlarmReceiver.class.getSimpleName();
     @Inject
-    ImageLoader mImageLoader;
+    IL mIL;
 
     public AlarmReceiver() {
         App.getApp().getMainComponent().inject(this);
@@ -49,7 +49,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 })
                 .map(pictureHelper -> pictureHelper.getFullResFromId(
                         pictureHelper.getPictureId(17)))
-                .flatMap(mImageLoader::getBitMap)
+                .flatMap(mIL::getBitMap)
                 .map(bitmap -> {
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 90, bos);

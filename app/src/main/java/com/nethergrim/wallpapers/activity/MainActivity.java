@@ -29,7 +29,7 @@ import com.nethergrim.wallpapers.App;
 import com.nethergrim.wallpapers.BuildConfig;
 import com.nethergrim.wallpapers.R;
 import com.nethergrim.wallpapers.fragment.ImageFragment;
-import com.nethergrim.wallpapers.images.ImageLoader;
+import com.nethergrim.wallpapers.images.IL;
 import com.nethergrim.wallpapers.storage.Prefs;
 import com.nethergrim.wallpapers.storage.ThumbsDownTransaction;
 import com.nethergrim.wallpapers.storage.ThumbsUpTransaction;
@@ -73,7 +73,7 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
     ImageButton mBtnThumpsUp;
 
     @Inject
-    ImageLoader mImageLoader;
+    IL mIL;
 
     @Inject
     Firebase mFirebase;
@@ -201,7 +201,7 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
     @OnClick(R.id.btn_share)
     void onShareClick() {
         showOverlay();
-        mImageLoader.getBitMap(getCurrentUrl())
+        mIL.getBitMap(getCurrentUrl())
                 .map(FileUtils::persistBitmapToDisk)
                 .subscribe(uri -> {
                     hideOverlay();
@@ -222,7 +222,7 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
         mPrefs.setAutoRefresh(false);
         mSwitchAutoChange.setChecked(false);
         showOverlay();
-        mImageLoader.getBitMap(getCurrentUrl())
+        mIL.getBitMap(getCurrentUrl())
                 .map(bitmap -> {
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 90, bos);

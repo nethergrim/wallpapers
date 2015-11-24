@@ -16,11 +16,11 @@ import rx.schedulers.Schedulers;
 /**
  * @author Andrew Drobyazko (c2q9450@gmail.com) on 07.09.15.
  */
-public class ImageLoaderImpl implements ImageLoader {
+public class PicassoILImpl implements IL {
 
     private Context mContext;
 
-    public ImageLoaderImpl(Context context) {
+    public PicassoILImpl(Context context) {
         mContext = context;
     }
 
