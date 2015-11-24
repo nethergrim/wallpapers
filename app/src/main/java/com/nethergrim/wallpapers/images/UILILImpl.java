@@ -10,6 +10,7 @@ import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.utils.StorageUtils;
 
@@ -37,13 +38,16 @@ public class UILILImpl implements IL {
         DisplayImageOptions options = new DisplayImageOptions.Builder()
                 .resetViewBeforeLoading(true)
                 .cacheInMemory(true)
+                .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
+                .bitmapConfig(Bitmap.Config.RGB_565)
                 .cacheOnDisk(true)
                 .build();
 
         config = new ImageLoaderConfiguration.Builder(mContext)
-                .threadPriority(Thread.NORM_PRIORITY - 3)
-                .tasksProcessingOrder(QueueProcessingType.FIFO)
-                .memoryCache(new LruMemoryCache(5 * 1024 * 1024))
+                .threadPriority(Thread.NORM_PRIORITY - 1)
+                .tasksProcessingOrder(QueueProcessingType.LIFO)
+                .memoryCache(new LruMemoryCache(10 * 1024 * 1024))
+                .threadPoolSize(5)
                 .diskCache(new UnlimitedDiskCache(cacheDir))
                 .defaultDisplayImageOptions(options)
                 .build();
