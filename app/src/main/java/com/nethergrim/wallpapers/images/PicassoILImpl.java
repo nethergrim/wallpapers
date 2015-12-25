@@ -87,7 +87,7 @@ public class PicassoILImpl implements IL {
                             Bitmap bitmap = mPicasso.load(url).get();
                             subscriber.onNext(bitmap);
                             subscriber.onCompleted();
-                        } catch (IOException e) {
+                        } catch (Throwable e) {
                             subscriber.onError(e);
                         }
 
