@@ -25,6 +25,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.firebase.client.Firebase;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.nethergrim.wallpapers.App;
 import com.nethergrim.wallpapers.BuildConfig;
 import com.nethergrim.wallpapers.R;
@@ -74,6 +76,8 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
 
     @Inject
     IL mIL;
+    @Inject
+    Tracker mTracker;
 
     @Inject
     Firebase mFirebase;
@@ -185,6 +189,10 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
 
     @OnClick(R.id.btn_download)
     void onDownloadClick() {
+        mTracker.send(new HitBuilders.EventBuilder()
+                .setCategory("Action")
+                .setAction("Download")
+                .build());
         DownloadManager downloadManager = (DownloadManager) getSystemService(
                 Context.DOWNLOAD_SERVICE);
         DownloadManager.Request request = new DownloadManager.Request(
@@ -200,6 +208,10 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
 
     @OnClick(R.id.btn_share)
     void onShareClick() {
+        mTracker.send(new HitBuilders.EventBuilder()
+                .setCategory("Action")
+                .setAction("Share")
+                .build());
         showOverlay();
         mIL.getBitMap(getCurrentUrl())
                 .map(FileUtils::persistBitmapToDisk)
@@ -219,6 +231,10 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
 
     @OnClick(R.id.btn_set_wallpaper)
     void onWallpaperClick() {
+        mTracker.send(new HitBuilders.EventBuilder()
+                .setCategory("Action")
+                .setAction("Set_Wallpaper")
+                .build());
         mPrefs.setAutoRefresh(false);
         mSwitchAutoChange.setChecked(false);
         showOverlay();
@@ -251,6 +267,10 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
 
     @OnClick(R.id.btn_thumps_up)
     void onThumbsUpClick() {
+        mTracker.send(new HitBuilders.EventBuilder()
+                .setCategory("Action")
+                .setAction("ThumbsUp")
+                .build());
         showToast("+1");
         int id = getCurrentId();
         mFirebase.child("ratings")
@@ -261,6 +281,10 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
 
     @OnClick(R.id.btn_thumps_down)
     void onThumbsDownClick() {
+        mTracker.send(new HitBuilders.EventBuilder()
+                .setCategory("Action")
+                .setAction("ThumbsDown")
+                .build());
         showToast("-1");
         int id = getCurrentId();
         mFirebase.child("ratings")
@@ -342,4 +366,10 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mTracker.setScreenName("Main Screen");
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+    }
 }

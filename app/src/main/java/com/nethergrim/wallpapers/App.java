@@ -22,7 +22,7 @@ public class App extends Application {
         super.onCreate();
         _app = this;
         this.mMainComponent = DaggerMainComponent.builder()
-                .providerModule(new ProviderModule())
+                .providerModule(new ProviderModule(this))
                 .build();
         Firebase.setAndroidContext(this);
         Config config = new Config();
