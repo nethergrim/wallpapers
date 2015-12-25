@@ -38,8 +38,8 @@ public class UILILImpl implements IL {
         DisplayImageOptions options = new DisplayImageOptions.Builder()
                 .resetViewBeforeLoading(true)
                 .cacheInMemory(true)
-                .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
-                .bitmapConfig(Bitmap.Config.RGB_565)
+                .imageScaleType(ImageScaleType.NONE_SAFE)
+                .bitmapConfig(Bitmap.Config.ARGB_8888)
                 .cacheOnDisk(true)
                 .build();
 

@@ -4,9 +4,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.picasso.LruCache;
+import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.concurrent.Executors;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -19,15 +23,24 @@ import rx.schedulers.Schedulers;
 public class PicassoILImpl implements IL {
 
     private Context mContext;
+    private Picasso mPicasso;
 
-    public PicassoILImpl(Context context) {
+    public PicassoILImpl(Context context, OkHttpClient okHttpClient) {
         mContext = context;
+
+        mPicasso = new Picasso.Builder(mContext)
+                .memoryCache(new LruCache(mContext))
+                .defaultBitmapConfig(Bitmap.Config.ARGB_8888)
+                .downloader(new OkHttpDownloader(okHttpClient))
+                .executor(Executors.newCachedThreadPool())
+                .build();
+
     }
 
     @Override
     public void displayImage(String url, ImageView imageView) {
-        Picasso.with(mContext).cancelRequest(imageView);
-        Picasso.with(mContext).load(url).into(imageView);
+        mPicasso.cancelRequest(imageView);
+        mPicasso.load(url).into(imageView);
     }
 
     @Override
@@ -50,7 +63,7 @@ public class PicassoILImpl implements IL {
                             return;
                         }
                         try {
-                            Picasso.with(mContext).load(url).get();
+                            mPicasso.load(url).get();
                             subscriber.onNext(Boolean.TRUE);
                             subscriber.onCompleted();
                         } catch (IOException e) {
@@ -71,7 +84,7 @@ public class PicassoILImpl implements IL {
                             return;
                         }
                         try {
-                            Bitmap bitmap = Picasso.with(mContext).load(url).get();
+                            Bitmap bitmap = mPicasso.load(url).get();
                             subscriber.onNext(bitmap);
                             subscriber.onCompleted();
                         } catch (IOException e) {

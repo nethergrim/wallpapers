@@ -14,7 +14,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -40,6 +40,7 @@ import com.nethergrim.wallpapers.util.FileUtils;
 import com.nethergrim.wallpapers.util.LayoutAnimator;
 import com.nethergrim.wallpapers.util.PictureHelper;
 import com.rey.material.widget.Switch;
+import com.xgc1986.parallaxPagerTransformer.ParallaxPagerTransformer;
 
 import org.json.JSONArray;
 
@@ -179,6 +180,7 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
                     return new PictureHelper(jsonArray);
                 })
                 .subscribe(ph -> {
+                    mPager.setPageTransformer(false, new ParallaxPagerTransformer(R.id.pagerImage));
                     mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), ph);
                     mPager.setAdapter(mPagerAdapter);
                 });
@@ -333,7 +335,7 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
         return mPagerAdapter.getCurrentId(mPager.getCurrentItem());
     }
 
-    private static class PagerAdapter extends FragmentPagerAdapter {
+    private static class PagerAdapter extends FragmentStatePagerAdapter {
 
         private PictureHelper mPictureHelper;
 

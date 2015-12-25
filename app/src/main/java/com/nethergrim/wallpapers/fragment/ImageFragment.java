@@ -22,7 +22,7 @@ public class ImageFragment extends BaseFragment {
     public static final String FULL_URL = "https://www.gstatic.com/prettyearth/assets/full/";
 
 
-    @InjectView(R.id.image)
+    @InjectView(R.id.pagerImage)
     ImageView mImage;
     private int mId;
 

@@ -6,9 +6,13 @@ import com.google.android.gms.analytics.Tracker;
 import com.nethergrim.wallpapers.App;
 import com.nethergrim.wallpapers.R;
 import com.nethergrim.wallpapers.images.IL;
-import com.nethergrim.wallpapers.images.UILILImpl;
+import com.nethergrim.wallpapers.images.PicassoILImpl;
 import com.nethergrim.wallpapers.storage.Prefs;
 import com.nethergrim.wallpapers.storage.PrefsImpl;
+import com.squareup.okhttp.Cache;
+import com.squareup.okhttp.OkHttpClient;
+
+import java.io.File;
 
 import javax.inject.Singleton;
 
@@ -30,8 +34,19 @@ public class ProviderModule {
 
     @Provides
     @Singleton
-    IL provideImageLoader() {
-        return new UILILImpl();
+    IL provideImageLoader(OkHttpClient okHttpClient) {
+        return new PicassoILImpl(mApp, okHttpClient);
+    }
+
+    @Provides
+    @Singleton
+    OkHttpClient provideOkHttp() {
+        File httpCacheDirectory = new File(mApp.getCacheDir(), "okhttp");
+        Cache cache;
+        cache = new Cache(httpCacheDirectory, 500 * 1024 * 1024);
+        OkHttpClient okHttpClient = new OkHttpClient();
+        okHttpClient.setCache(cache);
+        return okHttpClient;
     }
 
     @Provides
