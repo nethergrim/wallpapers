@@ -2,6 +2,7 @@ package com.nethergrim.wallpapers;
 
 import android.app.Application;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.firebase.client.Config;
 import com.firebase.client.Firebase;
 import com.nethergrim.wallpapers.inject.DaggerMainComponent;
@@ -31,6 +32,7 @@ public class App extends Application {
         YandexMetrica.activate(this, "c382286b-24f3-48e0-a834-294f47c4756f");
         YandexMetrica.setTrackLocationEnabled(false);
         YandexMetrica.setCollectInstalledApps(false);
+        Fresco.initialize(this);
     }
 
     public MainComponent getMainComponent() {

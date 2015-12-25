@@ -68,6 +68,7 @@ dependencies {
 
     compile 'com.xgc1986.android:parallaxpagertransformer:1.0.3'
 
+    compile 'com.facebook.fresco:fresco:0.7.0+'
 
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.okhttp:okhttp:2.7.0'
