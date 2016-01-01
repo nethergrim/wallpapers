@@ -2,6 +2,7 @@ package com.nethergrim.wallpapers.images;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 import android.widget.ImageView;
 
 import com.squareup.okhttp.OkHttpClient;
@@ -41,6 +42,11 @@ public class PicassoILImpl implements IL {
     public void displayImage(String url, ImageView imageView) {
         mPicasso.cancelRequest(imageView);
         mPicasso.load(url).into(imageView);
+    }
+
+    @Override
+    public void cacheImage(@NonNull String url) {
+        throw  new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override

@@ -14,6 +14,7 @@ import com.nethergrim.wallpapers.App;
 import com.nethergrim.wallpapers.R;
 import com.nethergrim.wallpapers.adapters.WallpapersListAdapter;
 import com.nethergrim.wallpapers.util.ConnectionUtils;
+import com.nethergrim.wallpapers.util.PrefetchScrollListener;
 
 import javax.inject.Inject;
 
@@ -47,6 +48,7 @@ public class ListActivity extends BaseActivity
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         App.getApp().getMainComponent().inject(this);
+        getWindow().setBackgroundDrawable(null);
         setContentView(R.layout.activity_list);
         ButterKnife.inject(this);
         observeConnectivity();
@@ -75,11 +77,15 @@ public class ListActivity extends BaseActivity
     private void initList() {
         Query query = mFirebase.child("ratings").orderByValue();
         mAdapter = new WallpapersListAdapter(query, this, this);
+
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,
                 LinearLayoutManager.VERTICAL, true);
         linearLayoutManager.setStackFromEnd(true);
         mRecyclerView.setLayoutManager(linearLayoutManager);
+        PrefetchScrollListener prefetchScrollListener = new PrefetchScrollListener(
+                linearLayoutManager, mAdapter);
+        mRecyclerView.addOnScrollListener(prefetchScrollListener);
     }
 }

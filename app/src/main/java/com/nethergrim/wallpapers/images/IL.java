@@ -1,6 +1,7 @@
 package com.nethergrim.wallpapers.images;
 
 import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 import android.widget.ImageView;
 
 import rx.Observable;
@@ -11,6 +12,8 @@ import rx.Observable;
 public interface IL {
 
     void displayImage(String url, ImageView imageView);
+
+    void cacheImage(@NonNull String url);
 
     Observable<Bitmap> getBitMap(String url);
 

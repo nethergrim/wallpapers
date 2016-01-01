@@ -2,9 +2,11 @@ package com.nethergrim.wallpapers.images;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 import android.widget.ImageView;
 
 import com.nethergrim.wallpapers.App;
+import com.nethergrim.wallpapers.util.FileUtils;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -39,14 +41,14 @@ public class UILILImpl implements IL {
                 .resetViewBeforeLoading(true)
                 .cacheInMemory(true)
                 .imageScaleType(ImageScaleType.NONE_SAFE)
-                .bitmapConfig(Bitmap.Config.ARGB_8888)
+                .bitmapConfig(Bitmap.Config.RGB_565)
                 .cacheOnDisk(true)
                 .build();
 
         config = new ImageLoaderConfiguration.Builder(mContext)
                 .threadPriority(Thread.NORM_PRIORITY - 1)
                 .tasksProcessingOrder(QueueProcessingType.LIFO)
-                .memoryCache(new LruMemoryCache(10 * 1024 * 1024))
+                .memoryCache(new LruMemoryCache(FileUtils.calculateMemoryCacheSize(mContext)))
                 .threadPoolSize(5)
                 .diskCache(new UnlimitedDiskCache(cacheDir))
                 .defaultDisplayImageOptions(options)
@@ -58,7 +60,13 @@ public class UILILImpl implements IL {
 
     @Override
     public void displayImage(String url, ImageView imageView) {
+        imageLoader.cancelDisplayTask(imageView);
         imageLoader.displayImage(url, imageView);
+    }
+
+    @Override
+    public void cacheImage(@NonNull String url) {
+        imageLoader.loadImage(url, null);
     }
 
     @Override

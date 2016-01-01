@@ -138,7 +138,7 @@ public abstract class FirebaseAdapter<F extends RecyclerView.ViewHolder>
         mKeys.clear();
     }
 
-    public Object getItem(int i) {
+    public Rating getData(int i) {
         return mModels.get(i);
     }
 
