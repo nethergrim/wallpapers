@@ -8,6 +8,13 @@
         <item name="colorPrimary">@color/my_primary</item>
         <item name="colorAccent">@color/my_accent</item>
 
+    </style>
+
+    <style name="AppTheme_ColoredStatusbar" parent="Theme.AppCompat.Light.NoActionBar">
+
+        <item name="android:statusBarColor">@color/my_primary</item>
+        <item name="colorPrimary">@color/my_primary</item>
+        <item name="colorAccent">@color/my_accent</item>
 
     </style>
 </resources>
