@@ -19,6 +19,7 @@ import com.nethergrim.wallpapers.R;
 import com.nethergrim.wallpapers.adapters.WallpapersListAdapter;
 import com.nethergrim.wallpapers.util.ConnectionUtils;
 import com.nethergrim.wallpapers.util.PrefetchScrollListener;
+import com.nethergrim.wallpapers.util.VerticalSpaceItemDecoration;
 
 import javax.inject.Inject;
 
@@ -95,6 +96,7 @@ public class ListActivity extends BaseActivity
                 LinearLayoutManager.VERTICAL, true);
         linearLayoutManager.setStackFromEnd(true);
         mRecyclerView.setLayoutManager(linearLayoutManager);
+        mRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration((int) (App.density * 2)));
         PrefetchScrollListener prefetchScrollListener = new PrefetchScrollListener(
                 linearLayoutManager, mAdapter);
         mRecyclerView.addOnScrollListener(prefetchScrollListener);

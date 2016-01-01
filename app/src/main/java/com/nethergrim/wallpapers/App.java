@@ -17,10 +17,12 @@ public class App extends Application {
 
     private static App _app;
     private MainComponent mMainComponent;
+    public static float density;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        density = getResources().getDisplayMetrics().density;
         _app = this;
         this.mMainComponent = DaggerMainComponent.builder()
                 .providerModule(new ProviderModule(this))
