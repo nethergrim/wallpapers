@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -94,6 +95,8 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
     Switch mSwitchAutoChange;
     @InjectView(R.id.settings_layout)
     LinearLayout mSettingsLayout;
+    @InjectView(R.id.fabList)
+    FloatingActionButton mFabList;
     private PagerAdapter mPagerAdapter;
     private LayoutAnimator mLayoutAnimator;
     private GestureDetector mTapGestureDetector;
@@ -116,6 +119,13 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
             alarmManager.cancel(pendingIntent);
 
         }
+    }
+
+    @OnClick(R.id.fabList)
+    public void onFabClicked(View view) {
+        Intent intent = new Intent(this, ListActivity.class);
+        startActivity(intent);
+
     }
 
     @Override
@@ -187,6 +197,13 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
         if (BuildConfig.PAID.equalsIgnoreCase("true")) {
             showToast("Thank you for purchase!\n=)");
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mTracker.setScreenName("Main Screen");
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     @OnClick(R.id.btn_download)
@@ -366,12 +383,5 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
         public int getCount() {
             return mPictureHelper.getSize();
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mTracker.setScreenName("Main Screen");
-        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 }

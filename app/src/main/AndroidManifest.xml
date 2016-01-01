@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    package="com.nethergrim.wallpapers"
+<manifest package="com.nethergrim.wallpapers"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
@@ -26,6 +25,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".activity.ListActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="false" />
 
         <receiver android:name=".util.AlarmReceiver" />
     </application>

@@ -10,4 +10,5 @@
     <string name="wallpapers_will_be_switched">Wallpapers will be switched automatically every 30 minutes.</string>
     <string name="wallpaper_set">Wallpaper set</string>
     <string name="wallpaper_will_be_saved_to">Wallpaper will be saved to:</string>
+    <string name="network_error">Network error.\nPlease try again later.</string>
 </resources>
