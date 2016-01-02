@@ -2,6 +2,7 @@ package com.nethergrim.wallpapers.inject;
 
 import com.nethergrim.wallpapers.activity.ListActivity;
 import com.nethergrim.wallpapers.activity.MainActivity;
+import com.nethergrim.wallpapers.activity.WallpaperDetailsActivity;
 import com.nethergrim.wallpapers.adapters.WallpapersListAdapter;
 import com.nethergrim.wallpapers.fragment.BaseFragment;
 import com.nethergrim.wallpapers.util.AlarmReceiver;
@@ -30,4 +31,6 @@ public interface MainComponent {
     void inject(ListActivity listActivity);
 
     void inject(WallpapersListAdapter wallpapersListAdapter);
+
+    void inject(WallpaperDetailsActivity wallpaperDetailsActivity);
 }

@@ -17,8 +17,10 @@ import com.firebase.client.Query;
 import com.nethergrim.wallpapers.App;
 import com.nethergrim.wallpapers.R;
 import com.nethergrim.wallpapers.adapters.WallpapersListAdapter;
+import com.nethergrim.wallpapers.model.Rating;
 import com.nethergrim.wallpapers.util.ConnectionUtils;
 import com.nethergrim.wallpapers.util.PrefetchScrollListener;
+import com.nethergrim.wallpapers.util.RecyclerItemClickListener;
 import com.nethergrim.wallpapers.util.VerticalSpaceItemDecoration;
 
 import javax.inject.Inject;
@@ -100,5 +102,12 @@ public class ListActivity extends BaseActivity
         PrefetchScrollListener prefetchScrollListener = new PrefetchScrollListener(
                 linearLayoutManager, mAdapter);
         mRecyclerView.addOnScrollListener(prefetchScrollListener);
+        mRecyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(this, (view, position) -> {
+                    // do whatever
+                    Rating rating = mAdapter.getData(position);
+                    WallpaperDetailsActivity.start(ListActivity.this, rating.getId());
+                })
+        );
     }
 }
