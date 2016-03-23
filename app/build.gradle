@@ -74,8 +74,8 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.7.0'
 
     provided 'org.glassfish:javax.annotation:10.0-b28'
-    compile 'com.google.dagger:dagger:2.1-SNAPSHOT'
-    apt 'com.google.dagger:dagger-compiler:2.1-SNAPSHOT'
+    compile 'com.google.dagger:dagger:2.0'
+    apt 'com.google.dagger:dagger-compiler:2.0'
     compile 'io.reactivex:rxandroid:1.0.1'
     compile 'io.reactivex:rxjava:1.0.14'
     compile 'com.jakewharton.rxbinding:rxbinding:0.2.0'
