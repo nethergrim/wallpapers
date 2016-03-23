@@ -31,9 +31,9 @@ public class PicassoILImpl implements IL {
 
         mPicasso = new Picasso.Builder(mContext)
                 .memoryCache(new LruCache(mContext))
+                .executor(Executors.newFixedThreadPool(5))
                 .defaultBitmapConfig(Bitmap.Config.ARGB_8888)
                 .downloader(new OkHttpDownloader(okHttpClient))
-                .executor(Executors.newCachedThreadPool())
                 .build();
 
     }
@@ -46,7 +46,7 @@ public class PicassoILImpl implements IL {
 
     @Override
     public void cacheImage(@NonNull String url) {
-        throw  new UnsupportedOperationException("Not implemented yet");
+        mPicasso.load(url).fetch();
     }
 
     @Override
