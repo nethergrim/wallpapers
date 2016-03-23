@@ -1,13 +1,12 @@
 package com.nethergrim.wallpapers.fragment;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.nethergrim.wallpapers.R;
 
 import butterknife.ButterKnife;
@@ -23,7 +22,7 @@ public class ImageFragment extends BaseFragment {
     public static final String FULL_URL = "https://www.gstatic.com/prettyearth/assets/full/";
     public static final String JPG = ".jpg";
     @InjectView(R.id.pagerImage)
-    SimpleDraweeView mPagerImage;
+    ImageView mPagerImage;
 
 
     private int mId;
@@ -56,9 +55,7 @@ public class ImageFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         String url = FULL_URL + mId + JPG;
-        Uri uri = Uri.parse(url);
-        mPagerImage.setImageURI(uri);
-
+        mIL.displayImage(url, mPagerImage);
     }
 
     @Override

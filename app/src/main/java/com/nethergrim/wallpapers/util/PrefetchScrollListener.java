@@ -36,7 +36,7 @@ public class PrefetchScrollListener extends RecyclerView.OnScrollListener {
             firstVisible = mLinearLayoutManager.findFirstVisibleItemPosition();
             if (firstVisible > maxDeliveredItem) {
                 maxDeliveredItem = firstVisible;
-                mCallback.prefetchItemAtPosition(firstVisible + visibleItemCount - 2);
+                mCallback.prefetchItemAtPosition(firstVisible + visibleItemCount - 4);
             }
         }
     }
