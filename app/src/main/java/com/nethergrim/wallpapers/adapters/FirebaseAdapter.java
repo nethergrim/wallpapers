@@ -88,6 +88,9 @@ public abstract class FirebaseAdapter<F extends RecyclerView.ViewHolder>
                 Rating rating = getRating(dataSnapshot);
 
                 int index = mKeys.indexOf(rating.getId());
+                if (index == -1){
+                    return;
+                }
                 mModels.remove(index);
                 mKeys.remove(index);
                 if (previousChildName == null) {
