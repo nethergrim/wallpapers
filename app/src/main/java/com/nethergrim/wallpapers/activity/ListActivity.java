@@ -71,7 +71,11 @@ public class ListActivity extends BaseActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mAdapter.cleanup();
+        try {
+            mAdapter.cleanup();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 
     private void observeConnectivity() {
