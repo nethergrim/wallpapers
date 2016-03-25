@@ -2,16 +2,15 @@ package com.nethergrim.wallpapers.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.app.DownloadManager;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -21,6 +20,7 @@ import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
@@ -33,13 +33,13 @@ import com.nethergrim.wallpapers.images.IL;
 import com.nethergrim.wallpapers.storage.Prefs;
 import com.nethergrim.wallpapers.storage.ThumbsDownTransaction;
 import com.nethergrim.wallpapers.storage.ThumbsUpTransaction;
+import com.nethergrim.wallpapers.util.AlarmReceiver;
 import com.nethergrim.wallpapers.util.FileUtils;
 import com.nethergrim.wallpapers.util.PictureHelper;
 import com.nethergrim.wallpapers.util.RetryWithDelay;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 
 import javax.inject.Inject;
@@ -125,17 +125,23 @@ public class WallpaperDetailsActivity extends BaseActivity {
                 .setCategory("Action")
                 .setAction("Download")
                 .build());
-        DownloadManager downloadManager = (DownloadManager) getSystemService(
-                Context.DOWNLOAD_SERVICE);
-        DownloadManager.Request request = new DownloadManager.Request(
-                Uri.parse(getCurrentUrl()));
-        request.setTitle(getString(R.string.wallpaper) + " " + id);
-        request.setNotificationVisibility(
-                DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        downloadManager.enqueue(request);
-        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        showToast(getString(R.string.wallpaper_will_be_saved_to) + "\n" + path.toString());
+        showOverlay();
+        mImageLoader.getBitMap(getCurrentUrl())
+                .observeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
+                .map(FileUtils::persistBitmapToDownloads)
+                .map(file -> "Image was saved at:\n" + file.toString() + "\nEnjoy!")
+                .retryWhen(new RetryWithDelay(10, 300))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(s -> Toast.makeText(WallpaperDetailsActivity.this, s, Toast.LENGTH_LONG).show(),
+                        throwable -> {
+                            hideOverlay();
+                            Log.e(TAG, "call: ", throwable);
+                            showToast(R.string.network_error);
+                        }, this::hideOverlay);
     }
+
+    private static final String TAG = "WallpaperDetailsActivity";
 
     @OnClick(R.id.btn_share)
     void onShareClick() {
@@ -146,6 +152,7 @@ public class WallpaperDetailsActivity extends BaseActivity {
         showOverlay();
         mImageLoader.getBitMap(getCurrentUrl())
                 .map(FileUtils::persistBitmapToDisk)
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(uri -> {
                     hideOverlay();
                     Intent shareIntent = new Intent();
@@ -167,16 +174,20 @@ public class WallpaperDetailsActivity extends BaseActivity {
                 .setAction("Set_Wallpaper")
                 .build());
         mPrefs.setAutoRefresh(false);
-        onThumbsUpClick();
         showOverlay();
+        Intent intent = new Intent(this, AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(pendingIntent);
         mImageLoader.getBitMap(getCurrentUrl())
+                .subscribeOn(Schedulers.newThread())
                 .map(bitmap -> {
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 90, bos);
                     byte[] bitmapdata = bos.toByteArray();
+                    bitmap.recycle();
                     return new ByteArrayInputStream(bitmapdata);
                 })
-                .subscribeOn(Schedulers.newThread())
                 .doOnNext(inputStream -> {
                     WallpaperManager wallpaperManager = WallpaperManager.getInstance(
                             App.getApp());
@@ -186,6 +197,7 @@ public class WallpaperDetailsActivity extends BaseActivity {
                         e.printStackTrace();
                     }
                 })
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(bitmap -> {
                     hideOverlay();
                     showToast(R.string.wallpaper_set);
