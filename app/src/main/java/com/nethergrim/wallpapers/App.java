@@ -4,6 +4,7 @@ import android.app.Application;
 
 
 import com.crashlytics.android.Crashlytics;
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.firebase.client.Config;
 import com.firebase.client.Firebase;
 import com.nethergrim.wallpapers.inject.DaggerMainComponent;
@@ -24,7 +25,9 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics());
+        if (!BuildConfig.DEBUG){
+            Fabric.with(this, new Crashlytics());
+        }
         density = getResources().getDisplayMetrics().density;
         _app = this;
         this.mMainComponent = DaggerMainComponent.builder()
@@ -37,6 +40,7 @@ public class App extends Application {
         YandexMetrica.activate(this, "c382286b-24f3-48e0-a834-294f47c4756f");
         YandexMetrica.setTrackLocationEnabled(false);
         YandexMetrica.setCollectInstalledApps(false);
+        Fresco.initialize(this);
     }
 
     public MainComponent getMainComponent() {

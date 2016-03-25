@@ -61,8 +61,6 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
 
     @InjectView(R.id.pager)
     ViewPager mPager;
-    @InjectView(R.id.progressBar)
-    ProgressBar mProgressBar;
     @InjectView(R.id.btn_share)
     ImageButton mBtnShare;
     @InjectView(R.id.btn_download)
