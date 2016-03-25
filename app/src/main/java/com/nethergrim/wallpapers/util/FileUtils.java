@@ -74,6 +74,7 @@ public class FileUtils {
                     Log.i("ExternalStorage", "Scanned " + path + ":");
                     Log.i("ExternalStorage", "-> uri=" + uri);
                 });
+        System.gc();
         return Uri.fromFile(file);
     }
 
@@ -108,9 +109,11 @@ public class FileUtils {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();
             out.close();
-            bitmap.recycle();
+
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            bitmap.recycle();
         }
 
         // Tell the media scanner about the new file so that it is
@@ -120,10 +123,12 @@ public class FileUtils {
                     Log.i("ExternalStorage", "Scanned " + path + ":");
                     Log.i("ExternalStorage", "-> uri=" + uri);
                 });
+        System.gc();
         return file;
     }
 
 
+    @SuppressWarnings("deprecation")
     public static InputStream getAssetFileInputStream(String assetFileName) {
         Context context = App.getApp().getApplicationContext();
         InputStream fIn;
@@ -144,25 +149,29 @@ public class FileUtils {
 
         StringBuilder stringBuilder = new StringBuilder();
         String line;
-        BufferedReader in;
+        BufferedReader in = null;
         try {
-            in = new BufferedReader(new InputStreamReader(is));
-            while ((line = in.readLine()) != null) {
-                stringBuilder.append(line);
+            if (is != null) {
+                in = new BufferedReader(new InputStreamReader(is));
+            }
+            if (in != null) {
+                while ((line = in.readLine()) != null) {
+                    stringBuilder.append(line);
+                }
             }
         } catch (IOException e) {
             Log.e("TAG", e.getMessage());
         }
         String resultedString = stringBuilder.toString();
         try {
-            JSONArray jsonArray = new JSONArray(resultedString);
-            return jsonArray;
+            return new JSONArray(resultedString);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return null;
     }
 
+    @SuppressWarnings("unused")
     public static int calculateMemoryCacheSize(Context context) {
         ActivityManager am = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
         boolean largeHeap = (context.getApplicationInfo().flags & FLAG_LARGE_HEAP) != 0;
