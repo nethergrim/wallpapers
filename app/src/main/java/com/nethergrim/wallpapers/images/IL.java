@@ -11,7 +11,7 @@ import rx.Observable;
  */
 public interface IL {
 
-    void displayImage(String url, ImageView imageView);
+    void displayImage(String url, ImageView imageView, Bitmap.Config config);
 
     void cacheImage(@NonNull String url);
 

@@ -1,6 +1,7 @@
 package com.nethergrim.wallpapers.adapters;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,7 +67,7 @@ public class WallpapersListAdapter extends FirebaseAdapter<WallpapersListViewHol
             mCallback.onDataLoaded();
         }
         String url = PREVIEW_URL + data.getId() + ".jpg";
-        mIL.displayImage(url, holder.mDraweeView);
+        mIL.displayImage(url, holder.mDraweeView, Bitmap.Config.RGB_565);
     }
 
 }

@@ -23,14 +23,12 @@ import rx.schedulers.Schedulers;
  */
 public class PicassoILImpl implements IL {
 
-    private Context mContext;
     private Picasso mPicasso;
 
     public PicassoILImpl(Context context, OkHttpClient okHttpClient) {
-        mContext = context;
 
-        mPicasso = new Picasso.Builder(mContext)
-                .memoryCache(new LruCache(mContext))
+        mPicasso = new Picasso.Builder(context)
+                .memoryCache(new LruCache(context))
                 .executor(Executors.newFixedThreadPool(5))
                 .defaultBitmapConfig(Bitmap.Config.ARGB_8888)
                 .downloader(new OkHttpDownloader(okHttpClient))
@@ -39,9 +37,9 @@ public class PicassoILImpl implements IL {
     }
 
     @Override
-    public void displayImage(String url, ImageView imageView) {
+    public void displayImage(String url, ImageView imageView, Bitmap.Config config) {
         mPicasso.cancelRequest(imageView);
-        mPicasso.load(url).into(imageView);
+        mPicasso.load(url).config(config).into(imageView);
     }
 
     @Override
@@ -81,24 +79,7 @@ public class PicassoILImpl implements IL {
     }
 
     private Observable<Bitmap> getBitmapObservable(String url) {
-        return Observable.create(
-                new Observable.OnSubscribe<Bitmap>() {
-                    @Override
-                    public void call(final Subscriber<? super Bitmap> subscriber) {
-                        if (subscriber.isUnsubscribed()) {
-                            subscriber.onCompleted();
-                            return;
-                        }
-                        try {
-                            Bitmap bitmap = mPicasso.load(url).get();
-                            subscriber.onNext(bitmap);
-                            subscriber.onCompleted();
-                        } catch (Throwable e) {
-                            subscriber.onError(e);
-                        }
-
-                    }
-                })
+        return Observable.fromCallable(() -> mPicasso.load(url).get())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
 

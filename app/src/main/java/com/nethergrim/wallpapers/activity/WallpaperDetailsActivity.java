@@ -105,7 +105,7 @@ public class WallpaperDetailsActivity extends BaseActivity {
             window.setStatusBarColor(Color.BLACK);
         }
 
-        mImageLoader.displayImage(getCurrentUrl(), mImage);
+        mImageLoader.displayImage(getCurrentUrl(), mImage, Bitmap.Config.ARGB_8888);
     }
 
     @OnClick(R.id.btn_download)
