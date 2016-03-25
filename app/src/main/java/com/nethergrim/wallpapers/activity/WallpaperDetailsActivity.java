@@ -19,10 +19,11 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.firebase.client.Firebase;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -34,6 +35,7 @@ import com.nethergrim.wallpapers.storage.ThumbsDownTransaction;
 import com.nethergrim.wallpapers.storage.ThumbsUpTransaction;
 import com.nethergrim.wallpapers.util.FileUtils;
 import com.nethergrim.wallpapers.util.PictureHelper;
+import com.nethergrim.wallpapers.util.RetryWithDelay;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -45,6 +47,7 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 /**
@@ -63,8 +66,6 @@ public class WallpaperDetailsActivity extends BaseActivity {
     @Inject
     Prefs mPrefs;
 
-    @InjectView(R.id.image)
-    ImageView mImage;
     @InjectView(R.id.btn_share)
     ImageButton mBtnShare;
     @InjectView(R.id.btn_download)
@@ -81,6 +82,8 @@ public class WallpaperDetailsActivity extends BaseActivity {
     View mShadow;
     @InjectView(R.id.progressBar2)
     ProgressBar mProgressBar2;
+    @InjectView(R.id.imageView)
+    SubsamplingScaleImageView mImageView;
     private String id;
     private boolean mVoted;
 
@@ -104,8 +107,16 @@ public class WallpaperDetailsActivity extends BaseActivity {
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             window.setStatusBarColor(Color.BLACK);
         }
-
-        mImageLoader.displayImage(getCurrentUrl(), mImage, Bitmap.Config.ARGB_8888);
+        mImageLoader.getBitMap(getCurrentUrl())
+                .subscribeOn(Schedulers.io())
+                .map(FileUtils::persistBitmapToDisk)
+                .retryWhen(new RetryWithDelay(10, 300))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(uri -> {
+                    mImageView.setImage(ImageSource.uri(uri));
+                }, throwable -> {
+                    onBackPressed();
+                });
     }
 
     @OnClick(R.id.btn_download)
