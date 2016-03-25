@@ -5,8 +5,8 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.nethergrim.wallpapers.App;
 import com.nethergrim.wallpapers.R;
+import com.nethergrim.wallpapers.images.GlideIlImpl;
 import com.nethergrim.wallpapers.images.IL;
-import com.nethergrim.wallpapers.images.PicassoILImpl;
 import com.nethergrim.wallpapers.storage.Prefs;
 import com.nethergrim.wallpapers.storage.PrefsImpl;
 import com.squareup.okhttp.Cache;
@@ -35,7 +35,7 @@ public class ProviderModule {
     @Provides
     @Singleton
     IL provideImageLoader(OkHttpClient okHttpClient) {
-        return new PicassoILImpl(mApp, okHttpClient);
+        return new GlideIlImpl(mApp);
     }
 
     @Provides
