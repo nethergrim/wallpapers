@@ -46,9 +46,7 @@ android {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
     }
-    dexOptions {
-        incremental false
-    }
+
     productFlavors {
         free {
             applicationId "com.nethergrim.wallpapers"
@@ -80,7 +78,7 @@ dependencies {
     compile 'com.android.support:support-v4:23.2.1'
     compile 'com.google.android.gms:play-services-analytics:8.1.0'
     compile 'com.xgc1986.android:parallaxpagertransformer:1.0.3'
-    compile 'com.squareup.okhttp:okhttp:2.7.0'
+
     provided 'org.glassfish:javax.annotation:10.0-b28'
     compile 'com.google.dagger:dagger:2.0'
     apt 'com.google.dagger:dagger-compiler:2.0'
@@ -92,10 +90,8 @@ dependencies {
     compile 'com.github.johnkil.android-robototextview:robototextview:2.4.2'
     compile 'com.firebase:firebase-client-android:2.4.0+'
     compile 'com.github.pwittchen:reactivenetwork:0.1.4'
-    compile 'com.fmsirvent:parallaxeverywhere:1.0.4'
     compile 'com.android.support:design:23.2.1'
     compile 'com.davemorrissey.labs:subsampling-scale-image-view:3.4.1'
-    compile 'com.github.bumptech.glide:glide:3.7.0'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }

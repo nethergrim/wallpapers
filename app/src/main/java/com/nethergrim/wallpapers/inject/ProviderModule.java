@@ -9,10 +9,6 @@ import com.nethergrim.wallpapers.images.GlideIlImpl;
 import com.nethergrim.wallpapers.images.IL;
 import com.nethergrim.wallpapers.storage.Prefs;
 import com.nethergrim.wallpapers.storage.PrefsImpl;
-import com.squareup.okhttp.Cache;
-import com.squareup.okhttp.OkHttpClient;
-
-import java.io.File;
 
 import javax.inject.Singleton;
 
@@ -34,20 +30,10 @@ public class ProviderModule {
 
     @Provides
     @Singleton
-    IL provideImageLoader(OkHttpClient okHttpClient) {
+    IL provideImageLoader() {
         return new GlideIlImpl(mApp);
     }
 
-    @Provides
-    @Singleton
-    OkHttpClient provideOkHttp() {
-        File httpCacheDirectory = new File(mApp.getCacheDir(), "okhttp");
-        Cache cache;
-        cache = new Cache(httpCacheDirectory, 500 * 1024 * 1024);
-        OkHttpClient okHttpClient = new OkHttpClient();
-        okHttpClient.setCache(cache);
-        return okHttpClient;
-    }
 
     @Provides
     @Singleton

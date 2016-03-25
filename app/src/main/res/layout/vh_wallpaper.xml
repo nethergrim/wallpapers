@@ -6,13 +6,11 @@
     android:layout_height="180dp"
     tools:background="@android:color/holo_green_light">
 
-    <com.fmsirvent.ParallaxEverywhere.PEWImageView
+    <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/image"
+        pew:fadeDuration="0"
         android:layout_width="match_parent"
         android:scaleType="centerCrop"
-        pew:block_parallax_x="true"
-        pew:parallax_y="60dp"
-        pew:reverse="reverseY"
         android:layout_height="match_parent" />
 
 

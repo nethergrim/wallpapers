@@ -1,11 +1,13 @@
 package com.nethergrim.wallpapers.adapters;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.request.ImageRequest;
 import com.firebase.client.Query;
 import com.nethergrim.wallpapers.App;
 import com.nethergrim.wallpapers.R;
@@ -54,8 +56,9 @@ public class WallpapersListAdapter extends FirebaseAdapter<WallpapersListViewHol
     @Override
     public void prefetchItemAtPosition(int position) {
         try {
-            mIL.cacheImage(PREVIEW_URL + getData(position).getId() + ".jpg");
-        } catch (Exception e) {
+            String url = PREVIEW_URL + getData(position).getId() + ".jpg";
+            Fresco.getImagePipeline().prefetchToBitmapCache(ImageRequest.fromUri(Uri.parse(url)), url);
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }
@@ -67,7 +70,7 @@ public class WallpapersListAdapter extends FirebaseAdapter<WallpapersListViewHol
             mCallback.onDataLoaded();
         }
         String url = PREVIEW_URL + data.getId() + ".jpg";
-        mIL.displayImage(url, holder.mDraweeView, Bitmap.Config.RGB_565);
+        holder.mDraweeView.setImageURI(Uri.parse(url));
     }
 
 }

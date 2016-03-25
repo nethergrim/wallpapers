@@ -56,7 +56,6 @@ public class ImageFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         String url = FULL_URL + mId + JPG;
-//        mIL.displayImage(url, mPagerImage, Bitmap.Config.ARGB_8888);
         mPagerImage.setImageURI(Uri.parse(url));
     }
 

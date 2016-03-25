@@ -2,9 +2,8 @@ package com.nethergrim.wallpapers.adapters.viewholders;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.nethergrim.wallpapers.R;
 
 import butterknife.ButterKnife;
@@ -16,7 +15,7 @@ import butterknife.InjectView;
 public class WallpapersListViewHolder extends RecyclerView.ViewHolder {
 
     @InjectView(R.id.image)
-    public ImageView mDraweeView;
+    public SimpleDraweeView mDraweeView;
 
     public WallpapersListViewHolder(View itemView) {
         super(itemView);
