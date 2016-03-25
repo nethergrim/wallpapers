@@ -21,7 +21,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Random;
 
 import static android.content.Context.ACTIVITY_SERVICE;
 import static android.content.pm.ApplicationInfo.FLAG_LARGE_HEAP;
@@ -51,10 +50,8 @@ public class FileUtils {
                 .toString();
         File myDir = new File(root + "/earth_wallpapers");
         myDir.mkdirs();
-        Random generator = new Random();
-        int n = 10000;
-        n = generator.nextInt(n);
-        String fname = "Wallpaper-" + n + ".jpg";
+
+        String fname = "Wallpaper-" + System.currentTimeMillis() + ".jpg";
         File file = new File(myDir, fname);
         if (file.exists())
             file.delete();
@@ -63,6 +60,55 @@ public class FileUtils {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();
             out.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            bitmap.recycle();
+        }
+
+        // Tell the media scanner about the new file so that it is
+        // immediately available to the user.
+        MediaScannerConnection.scanFile(App.getApp(), new String[] {file.toString()}, null,
+                (path, uri) -> {
+                    Log.i("ExternalStorage", "Scanned " + path + ":");
+                    Log.i("ExternalStorage", "-> uri=" + uri);
+                });
+        return Uri.fromFile(file);
+    }
+
+    public static void persistBitmapToDisk(Bitmap bitmap, File file) throws Exception {
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static File persistBitmapToDownloads(Bitmap bitmap) {
+        String root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                .toString();
+        File myDir = new File(root + "/earth_wallpapers");
+        myDir.mkdirs();
+
+        String fname = "Wallpaper-" + System.currentTimeMillis() + ".jpg";
+        File file = new File(myDir, fname);
+        if (file.exists())
+            file.delete();
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            out.flush();
+            out.close();
+            bitmap.recycle();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -74,8 +120,7 @@ public class FileUtils {
                     Log.i("ExternalStorage", "Scanned " + path + ":");
                     Log.i("ExternalStorage", "-> uri=" + uri);
                 });
-        return Uri.fromFile(file);
-
+        return file;
     }
 
 
@@ -131,6 +176,7 @@ public class FileUtils {
 
     @TargetApi(HONEYCOMB)
     private static class ActivityManagerHoneycomb {
+
         static int getLargeMemoryClass(ActivityManager activityManager) {
             return activityManager.getLargeMemoryClass();
         }

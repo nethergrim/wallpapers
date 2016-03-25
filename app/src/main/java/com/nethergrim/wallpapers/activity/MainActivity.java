@@ -3,15 +3,12 @@ package com.nethergrim.wallpapers.activity;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.AlarmManager;
-import android.app.DownloadManager;
 import android.app.PendingIntent;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -24,6 +21,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.firebase.client.Firebase;
 import com.google.android.gms.analytics.HitBuilders;
@@ -40,6 +38,7 @@ import com.nethergrim.wallpapers.util.AlarmReceiver;
 import com.nethergrim.wallpapers.util.FileUtils;
 import com.nethergrim.wallpapers.util.LayoutAnimator;
 import com.nethergrim.wallpapers.util.PictureHelper;
+import com.nethergrim.wallpapers.util.RetryWithDelay;
 import com.rey.material.widget.Switch;
 import com.xgc1986.parallaxPagerTransformer.ParallaxPagerTransformer;
 
@@ -47,7 +46,6 @@ import org.json.JSONArray;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 
 import javax.inject.Inject;
@@ -212,18 +210,23 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
                 .setCategory("Action")
                 .setAction("Download")
                 .build());
-        DownloadManager downloadManager = (DownloadManager) getSystemService(
-                Context.DOWNLOAD_SERVICE);
-        DownloadManager.Request request = new DownloadManager.Request(
-                Uri.parse(getCurrentUrl()));
-        request.setTitle(getString(R.string.wallpaper) + " " + mPagerAdapter.getCurrentId(
-                mPager.getCurrentItem()));
-        request.setNotificationVisibility(
-                DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        downloadManager.enqueue(request);
-        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        showToast(getString(R.string.wallpaper_will_be_saved_to) + "\n" + path.toString());
+        showOverlay();
+        mIL.getBitMap(getCurrentUrl())
+                .observeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
+                .map(FileUtils::persistBitmapToDownloads)
+                .map(file -> "Image was saved at:\n" + file.toString() + "\nEnjoy!")
+                .retryWhen(new RetryWithDelay(10, 300))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(s -> Toast.makeText(MainActivity.this, s, Toast.LENGTH_LONG).show(),
+                        throwable -> {
+                            hideOverlay();
+                            Log.e(TAG, "call: ", throwable);
+                            showToast(R.string.network_error);
+                        }, this::hideOverlay);
     }
+
+    private static final String TAG = "MainActivity";
 
     @OnClick(R.id.btn_share)
     void onShareClick() {
@@ -234,6 +237,7 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
         showOverlay();
         mIL.getBitMap(getCurrentUrl())
                 .map(FileUtils::persistBitmapToDisk)
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(uri -> {
                     hideOverlay();
                     Intent shareIntent = new Intent();
@@ -258,13 +262,14 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
         mSwitchAutoChange.setChecked(false);
         showOverlay();
         mIL.getBitMap(getCurrentUrl())
+                .subscribeOn(Schedulers.newThread())
                 .map(bitmap -> {
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 90, bos);
                     byte[] bitmapdata = bos.toByteArray();
+                    bitmap.recycle();
                     return new ByteArrayInputStream(bitmapdata);
                 })
-                .subscribeOn(Schedulers.newThread())
                 .doOnNext(inputStream -> {
                     WallpaperManager wallpaperManager = WallpaperManager.getInstance(
                             App.getApp());
@@ -274,6 +279,7 @@ public class MainActivity extends BaseActivity implements Switch.OnCheckedChange
                         e.printStackTrace();
                     }
                 })
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(bitmap -> {
                     hideOverlay();
                     showToast(R.string.wallpaper_set);

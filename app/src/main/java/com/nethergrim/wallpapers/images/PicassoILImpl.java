@@ -7,6 +7,7 @@ import android.widget.ImageView;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.picasso.LruCache;
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 
@@ -15,7 +16,6 @@ import java.util.concurrent.Executors;
 
 import rx.Observable;
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 /**
@@ -38,7 +38,6 @@ public class PicassoILImpl implements IL {
 
     @Override
     public void displayImage(String url, ImageView imageView, Bitmap.Config config) {
-        mPicasso.cancelRequest(imageView);
         mPicasso.load(url).config(config).into(imageView);
     }
 
@@ -79,9 +78,8 @@ public class PicassoILImpl implements IL {
     }
 
     private Observable<Bitmap> getBitmapObservable(String url) {
-        return Observable.fromCallable(() -> mPicasso.load(url).get())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+        return Observable.fromCallable(() -> mPicasso.load(url).memoryPolicy(MemoryPolicy.NO_STORE).get())
+                .subscribeOn(Schedulers.io());
 
     }
 }
