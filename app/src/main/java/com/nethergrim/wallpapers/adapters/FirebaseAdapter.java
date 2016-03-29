@@ -62,7 +62,9 @@ public abstract class FirebaseAdapter<F extends RecyclerView.ViewHolder>
                 // One of the mModels changed. Replace it in our list and name mapping
                 Rating rating = getRating(dataSnapshot);
                 int index = mKeys.indexOf(rating.getId());
-
+                if (index == -1){
+                    return;
+                }
                 mModels.set(index, rating);
 
                 notifyDataSetChanged();
